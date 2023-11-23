@@ -40,7 +40,8 @@ class OaWorkFlowView(OaWFApiViewMixin, APIView):
         workflow = request.oa_wf_api
         page = int(request.GET.get("page", 1))
         page_size = int(request.GET.get("page_size", 10))
-        data, page, todo_count = workflow.get_todo_list(page, page_size)
+        workflow_id = "???"
+        data, page, todo_count = workflow.get_todo_list(workflow_id, page, page_size)
         res = {
             "total": todo_count,
             "page_size": page_size,
@@ -62,7 +63,8 @@ class OaWorkFlowView(OaWFApiViewMixin, APIView):
         workflow = request.oa_wf_api
         page = int(request.GET.get("page", 1))
         page_size = int(request.GET.get("page_size", 10))
-        data, page, todo_count = workflow.get_handled_list(page, page_size)
+        workflow_id = "???"
+        data, page, todo_count = workflow.get_handled_list(workflow_id, page, page_size)
         res = {
             "total": todo_count,
             "page_size": page_size,
