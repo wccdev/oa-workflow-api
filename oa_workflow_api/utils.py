@@ -57,6 +57,14 @@ class OaApi:
 
         self.token = cache.get(self.CACHE_TOKEN_KEY)
 
+        self.maximum_recursion = 8
+        self.recursion_c = 0
+
+    def __helpme(self, error):
+        if self.recursion_c >= self.maximum_recursion:
+            raise ValueError(error)
+        self.recursion_c += 1
+
     def get_sso_token(self, login_id):
         raise BaseException("暂无法使用该方法")
         UMAP = {  # noqa
@@ -144,9 +152,10 @@ class OaApi:
         resp: requests.Response = rf(url, headers=headers, **kwargs)
 
         if resp.status_code != 200:
-            # FIXME  错误导致递归的问题
+            # 错误导致递归的问题
             # print(resp.text)
             # raise SystemError(f"OA: Response[{resp.status_code}]")
+            self.__helpme(f"OA: Response[{resp.status_code}]")
             headers[self.TOKEN_KEY] = self.get_token()
             return self.__request(api_path, rf, headers=headers, need_json=need_json, **kwargs)
 
@@ -172,12 +181,14 @@ class OaApi:
                 elif resp_msg.startswith("认证信息错误"):
                     explain_suf = "(或为OA APP_SECRET失效)"
                 elif resp_msg.startswith("token不存在或者超时"):
+                    self.__helpme(resp.text)
                     headers[self.TOKEN_KEY] = self.get_token()
                     return self.__request(api_path, rf, headers=headers, need_json=need_json, **kwargs)
                 else:
                     explain_suf = "(或为OA License过期)"
                 raise APIException(detail=f"OA Error: {resp_msg}。{explain_suf}")
             if resp_msg == "登录信息超时":
+                self.__helpme(resp.text)
                 headers[self.TOKEN_KEY] = self.get_token()
                 return self.__request(api_path, rf, headers=headers, need_json=need_json, **kwargs)
             raise ValueError(f"Error: {resp.text}")
@@ -268,18 +279,22 @@ class OaApi:
         }
         return user_info["data"]
 
-    def upload_file(self):
+    def upload_file(self, oa_category_id: str, file_source: BytesIO, file_name):
         """
-        上传附件(不可用)
+        上传附件
+        :param oa_category_id: Oa附件目录ID
+        :param file_source: 上传到Oa的文件内容
+        :param file_name: 上传到Oa的文件名称
         :return:
         """
-        # api_path = "/api/doc/upload/uploadFile2Doc"
-        api_path = "/api/doc/upload/uploadFile"
-        f = open('/Users/leslie/Desktop/123.txt', 'rb')
-        body = {"category": "30041", "name": f.name, "file": f}
-        _files = [('file', ('123.txt', f, 'text/plain'))]  # noqa
-        resp = self._post_oa(api_path, post_data=body)  # , files=_files
-        print(resp)
+        api_path = "/api/doc/upload/uploadFile2Doc"
+        # api_path = "/api/doc/upload/uploadFile"
+        body = {"category": oa_category_id, "name": file_name}
+        headers = self._request_headers.copy()
+        headers.pop("Content-Type")
+        files = {"file": file_source}
+        resp = self._post_oa(api_path, post_data=body, headers=headers, files=files)
+        return resp["data"]["fileid"]
 
 
 class OaWorkFlow(OaApi):
