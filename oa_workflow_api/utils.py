@@ -197,10 +197,14 @@ class OaApi:
         return res
 
     def _get_oa(self, api: str, params: dict = None, headers: dict = None, need_json=True):
-        return self.__request(api, requests.get, params=params, headers=headers, need_json=need_json)
+        res = self.__request(api, requests.get, params=params, headers=headers, need_json=need_json)
+        self.recursion_c = 0
+        return res
 
     def _post_oa(self, api: str, post_data: dict = None, headers: dict = None, need_json=True, **kwargs):
-        return self.__request(api, requests.post, data=post_data, headers=headers, need_json=need_json, **kwargs)
+        res = self.__request(api, requests.post, data=post_data, headers=headers, need_json=need_json, **kwargs)
+        self.recursion_c = 0
+        return res
 
     def _page_data(self, page_count_path, page_data_path, page=1, page_size=10):
         """
