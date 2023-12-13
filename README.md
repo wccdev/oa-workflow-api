@@ -20,12 +20,12 @@ Skeleton project created by Cookiecutter PyPackage
 ## Installation
 - 使用 pip:
 ```bash
-pip install wccoaworkflowapi
+pip install oa-workflow-api
 
 ```
 - 使用 poetry:
 ```bash
-poetry add wccoaworkflowapi
+poetry add oa-workflow-api
 ```
 
 ## Usage
