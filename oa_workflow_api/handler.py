@@ -5,7 +5,6 @@ from .utils import OaWorkFlow
 
 def get_handler(request):
     if not hasattr(request, "_oa_wf_api"):
-        print(request.user.id, request.user.username)
         request._oa_wf_api = OaWorkFlow()
     try:
         oa_user_id = request.user.oa_user_id
