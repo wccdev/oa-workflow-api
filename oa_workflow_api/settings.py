@@ -5,7 +5,23 @@ from django.test.signals import setting_changed
 
 # from django.utils.module_loading import import_string
 
-DEFAULTS = {"APP_ID": "", "APP_RAW_SECRET": "", "APP_SPK": "", "OA_HOST": "", "REQUESTS_LIBRARY": "requests"}
+DEFAULTS = {
+    "APP_ID": "",
+    "APP_RAW_SECRET": "",
+    "APP_SPK": "",
+    "OA_HOST": "",
+    "REQUESTS_LIBRARY": "requests",
+    # OA数据库，可选
+    "OA_DB_USER": "",
+    "OA_DB_PASSWORD": "",
+    "OA_DB_HOST": "",
+    "OA_DB_PORT": 0,
+    "OA_DB_SERVER_NAME": "",
+    # OA数据库用户表信息
+    "OA_DB_USER_TABLE": "ECOLOGY.HRMRESOURCE",
+    "OA_DB_USER_JOB_CODE_FIELD": "LOGINID",
+    "OA_DB_USER_FETCH_FIELDS": "ID, DEPARTMENTID",
+}
 
 
 # List of settings that may be in string import notation.

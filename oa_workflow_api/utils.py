@@ -16,22 +16,33 @@ from .settings import api_settings
 requests: system_requests = api_settings.REQUESTS_LIBRARY
 
 
-class OaApi:
-    TOKEN_KEY = "token"
-    CACHE_TOKEN_KEY = "oa-api-token"
-    REQUEST_CONTENTTYPE = "application/x-www-form-urlencoded; charset=utf-8"
-    REQUEST_HEADERS = {"Content-Type": REQUEST_CONTENTTYPE}
-
-    PUBLIC_KEY_PREFIX = "-----BEGIN PUBLIC KEY-----"
-    PUBLIC_KEY_SUFFIX = "-----END PUBLIC KEY-----"
+class FetchOaDbHandler:
+    @classmethod
+    def pre_checking(cls):
+        if not all(
+            [
+                api_settings.OA_DB_USER,
+                api_settings.OA_DB_PASSWORD,
+                api_settings.OA_DB_HOST,
+                api_settings.OA_DB_PORT,
+                api_settings.OA_DB_SERVER_NAME,
+            ]
+        ):
+            raise APIException("未有OA数据库连接配置")
 
     @classmethod
     def get_oa_user_id_by_work_code(cls, job_code: str) -> tuple:
         """
         通过长工号获取对应的OA用户id
         :param job_code: 长工号， A0009527...
+        :return: OA用户ID, OA用户部门ID
         """
-        sql = f"SELECT ID, DEPARTMENTID FROM ECOLOGY.HRMRESOURCE WHERE LOGINID = '{job_code}' "
+        cls.pre_checking()
+        sql = f"""
+            SELECT {api_settings.OA_DB_USER_FETCH_FIELDS}
+            FROM {api_settings.OA_DB_USERS_TABLE}
+            WHERE {api_settings.OA_DB_USER_JOB_CODE_FIELD} = '{job_code}'
+            """
         with get_oa_oracle_connection().cursor() as cursor:
             cursor.execute(sql)
             res = cursor.fetchone()
@@ -43,14 +54,31 @@ class OaApi:
     def get_oa_users_id_by_work_code(cls, job_codes: list) -> list:
         """
         批量通过长工号获取对应的OA用户id
+        :param job_codes: 长工号， ["A0009527", "A0009528", ...]
+        :return: [[OA用户ID, OA用户部门ID], ...] -> [[18781, 23], [18782, 23], ...]
         """
+        cls.pre_checking()
         job_codes = [f"'{i}'" for i in job_codes]
         conditions = f"({','.join(job_codes)})"
-        sql = f"SELECT ID, LOGINID FROM ECOLOGY.HRMRESOURCE WHERE LOGINID IN {conditions} "
+        sql = f"""
+            SELECT {api_settings.OA_DB_USER_FETCH_FIELDS}
+            FROM {api_settings.OA_DB_USERS_TABLE}
+            WHERE {api_settings.OA_DB_USER_JOB_CODE_FIELD} IN {conditions}
+            """
         with get_oa_oracle_connection().cursor() as cursor:
             cursor.execute(sql)
             res = cursor.fetchall()
         return list(res)
+
+
+class OaApi(FetchOaDbHandler):
+    TOKEN_KEY = "token"
+    CACHE_TOKEN_KEY = "oa-api-token"
+    REQUEST_CONTENTTYPE = "application/x-www-form-urlencoded; charset=utf-8"
+    REQUEST_HEADERS = {"Content-Type": REQUEST_CONTENTTYPE}
+
+    PUBLIC_KEY_PREFIX = "-----BEGIN PUBLIC KEY-----"
+    PUBLIC_KEY_SUFFIX = "-----END PUBLIC KEY-----"
 
     @classmethod
     def handle_pub_key(cls, pub_key):
@@ -115,13 +143,14 @@ class OaApi:
         return token
 
     @property
-    def user(self):
+    def user(self) -> dict:
         if getattr(self, "_user", None):
             return self._user
-        return {"userid": ""}
+        return {"userid": "", "deptid": None, "deptname": ""}
 
     def register_user(self, oa_user_id: str):
-        if getattr(self, "user", {}) and self.user["userid"] == oa_user_id:
+        oa_user_id = str(oa_user_id)
+        if getattr(self, "user", {}) and str(self.user["userid"]) == oa_user_id:
             return
 
         if not self.token:
@@ -129,6 +158,16 @@ class OaApi:
         self.oa_user_id = oa_user_id
         self.encrypt_userid = self.__encrypt_with_spk(oa_user_id)
         self._user = self.userinfo()
+
+    def register_user_with_job_code(self, job_code: str):
+        """
+        使用工号
+        :param job_code: 长工号， A0009527...
+        """
+        oa_user_id, oa_user_dept_id = self.get_oa_user_id_by_work_code(job_code)
+        if not oa_user_id:
+            raise APIException(f"Oa中未查询到工号为'{job_code}'的账号")
+        self.register_user(oa_user_id)
 
     def __encrypt_with_spk(self, text: str):
         """
@@ -279,7 +318,7 @@ class OaApi:
 
         return res, page, todo_count
 
-    def userinfo(self):
+    def userinfo(self) -> dict:
         """
         获取账号信息
         :return:
