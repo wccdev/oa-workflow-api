@@ -1,6 +1,9 @@
+from importlib import import_module
+
 from django.conf import settings
 from django.test.signals import setting_changed
-from django.utils.module_loading import import_string
+
+# from django.utils.module_loading import import_string
 
 DEFAULTS = {"APP_ID": "", "APP_RAW_SECRET": "", "APP_SPK": "", "OA_HOST": "", "REQUESTS_LIBRARY": "requests"}
 
@@ -30,7 +33,7 @@ def import_from_string(val, setting_name):
     Attempt to import a class from a string representation.
     """
     try:
-        return import_string(val)
+        return import_module(val)
     except ImportError as e:
         msg = f"Could not import '{val}' for API setting '{setting_name}'. {e.__class__.__name__}: {e}."
         raise ImportError(msg)
