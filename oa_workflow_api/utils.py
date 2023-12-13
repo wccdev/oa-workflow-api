@@ -9,6 +9,7 @@ from django.core.cache import cache
 from requests.exceptions import JSONDecodeError
 from rest_framework.exceptions import APIException
 
+from .db_connections import get_oa_oracle_connection
 from .settings import api_settings
 
 
@@ -20,6 +21,33 @@ class OaApi:
 
     PUBLIC_KEY_PREFIX = "-----BEGIN PUBLIC KEY-----"
     PUBLIC_KEY_SUFFIX = "-----END PUBLIC KEY-----"
+
+    @classmethod
+    def get_oa_user_id_by_work_code(cls, job_code: str) -> tuple:
+        """
+        通过长工号获取对应的OA用户id
+        :param job_code: 长工号， A0009527...
+        """
+        sql = f"SELECT ID, DEPARTMENTID FROM ECOLOGY.HRMRESOURCE WHERE LOGINID = '{job_code}' "
+        with get_oa_oracle_connection().cursor() as cursor:
+            cursor.execute(sql)
+            res = cursor.fetchone()
+        if not res:
+            return None, None
+        return res[0], res[1]
+
+    @classmethod
+    def get_oa_users_id_by_work_code(cls, job_codes: list) -> list:
+        """
+        批量通过长工号获取对应的OA用户id
+        """
+        job_codes = [f"'{i}'" for i in job_codes]
+        conditions = f"({','.join(job_codes)})"
+        sql = f"SELECT ID, LOGINID FROM ECOLOGY.HRMRESOURCE WHERE LOGINID IN {conditions} "
+        with get_oa_oracle_connection().cursor() as cursor:
+            cursor.execute(sql)
+            res = cursor.fetchall()
+        return list(res)
 
     @classmethod
     def handle_pub_key(cls, pub_key):
