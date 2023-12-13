@@ -101,6 +101,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 
 
+# from oa_workflow_api.mixin import OaWFApiViewMixin
+# class YourViewSet(OaWFApiViewMixin, APIView):  # 未注册中间件方式
 class YourViewSet(APIView):
     @action(detail=False)
     def test(self, request, *args, **kwargs):
