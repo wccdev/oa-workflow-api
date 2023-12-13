@@ -2,11 +2,13 @@ from django.conf import settings
 from django.test.signals import setting_changed
 from django.utils.module_loading import import_string
 
-DEFAULTS = {"APP_ID": "", "APP_RAW_SECRET": "", "APP_SPK": "", "OA_HOST": ""}
+DEFAULTS = {"APP_ID": "", "APP_RAW_SECRET": "", "APP_SPK": "", "OA_HOST": "", "REQUESTS_LIBRARY": "requests"}
 
 
 # List of settings that may be in string import notation.
-IMPORT_STRINGS = []  # noqa
+IMPORT_STRINGS = [
+    "REQUESTS_LIBRARY",
+]
 
 
 def perform_import(val, setting_name):
@@ -30,7 +32,7 @@ def import_from_string(val, setting_name):
     try:
         return import_string(val)
     except ImportError as e:
-        msg = "Could not import '%s' for API setting '%s'. %s: %s." % (val, setting_name, e.__class__.__name__, e)
+        msg = f"Could not import '{val}' for API setting '{setting_name}'. {e.__class__.__name__}: {e}."
         raise ImportError(msg)
 
 

@@ -46,7 +46,9 @@ OA_WORKFLOW_API = {
     # oa接口应用spk
     "APP_SPK": "xxxxxxxxxx",
     # oa接口服务地址(域名)
-    "OA_HOST": "https://oa.demo.com"  # noqa
+    "OA_HOST": "https://oa.demo.com",
+    # Requests HTTP Library
+    "REQUESTS_LIBRARY": "requests",
 }
 ```
 

@@ -3,7 +3,7 @@ import json
 from io import BytesIO
 from itertools import groupby
 
-import requests
+import requests as system_requests
 from Crypto.Cipher import PKCS1_v1_5
 from Crypto.PublicKey import RSA
 from django.core.cache import cache
@@ -12,6 +12,8 @@ from rest_framework.exceptions import APIException
 
 from .db_connections import get_oa_oracle_connection
 from .settings import api_settings
+
+requests: system_requests = api_settings.REQUESTS_LIBRARY
 
 
 class OaApi:
@@ -174,11 +176,16 @@ class OaApi:
         return headers
 
     def __request(
-        self, api_path, rf: any([requests.get, requests.post]), headers: dict = None, need_json=True, **kwargs  # noqa
+        self,
+        api_path,
+        rf: any([system_requests.get, system_requests.post]),
+        headers: dict = None,
+        need_json=True,
+        **kwargs,  # noqa
     ):
         url = f"{self.oa_host}{api_path}"
         headers = headers or self._request_headers
-        resp: requests.Response = rf(url, headers=headers, **kwargs)
+        resp: system_requests.Response = rf(url, headers=headers, **kwargs)
 
         if resp.status_code != 200:
             # 错误导致递归的问题
