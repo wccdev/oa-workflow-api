@@ -1,5 +1,5 @@
 """Top-level package for oa-workflow-api."""
 
-__author__ = """Leslie CHan"""
+__author__ = """Leslie Chan"""
 __email__ = 'ampedee@gmail.com'
-__version__ = '0.1.1'
+__version__ = '0.2.0'
