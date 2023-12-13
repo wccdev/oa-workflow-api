@@ -1,5 +1,6 @@
 import base64
 import json
+from io import BytesIO
 from itertools import groupby
 
 import requests

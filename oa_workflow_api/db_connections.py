@@ -3,7 +3,7 @@ from django.conf import settings
 
 try:
     oracledb.init_oracle_client()
-except Exception:
+except Exception as e:  # noqa
     pass
 
 
