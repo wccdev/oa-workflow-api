@@ -52,7 +52,7 @@ OA_WORKFLOW_API = {
 }
 ```
 
-### 1.全局使用
+### ~~1.全局使用~~(暂不推荐)
 - 在 django setting中注册中间件 `'oa_workflow_api.middleware.OaWFRequestMiddleware'`:
 ```python
 MIDDLEWARE = [
