@@ -8,7 +8,7 @@ UserModel = get_user_model()
 
 class AbstractOaUserInfo(models.Model):
     user_id = models.IntegerField(unique=True, primary_key=True, verbose_name="OA用户数据ID")
-    staff_code = models.ForeignKey(
+    staff_code = models.OneToOneField(
         UserModel,
         on_delete=models.DO_NOTHING,
         to_field=UserModel.USERNAME_FIELD,

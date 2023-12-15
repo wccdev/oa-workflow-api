@@ -34,6 +34,9 @@ poetry add oa-workflow-api
 INSTALLED_APPS = [
     "django.contrib.admin",
     ...,
+    "django.contrib.auth",
+    "xxxx.users",  # （项目指定AUTH_USER_MODEL的APP, 如果有）
+    ...,
     "oa_workflow_api",
 ]
 
@@ -47,7 +50,20 @@ OA_WORKFLOW_API = {
     "APP_SPK": "xxxxxxxxxx",
     # oa接口服务地址(域名)
     "OA_HOST": "https://oa.demo.com",
-    # Requests HTTP Library
+    # >以下可选< #
+    # OA数据库连接信息
+    "OA_DB_USER": "",
+    "OA_DB_PASSWORD": "",
+    "OA_DB_HOST": "",
+    "OA_DB_PORT": 0,
+    "OA_DB_SERVER_NAME": "",
+    # OA数据库用户表信息（此处为默认值）
+    "OA_DB_USER_TABLE": "ECOLOGY.HRMRESOURC",
+    "OA_DB_USER_ID_COLUMN": "ID",
+    "OA_DB_USER_STAFF_CODE_COLUMN": "LOGINID",
+    "OA_DB_USER_DEPT_ID_COLUMN": "DEPARTMENTID",
+    "OA_DB_USER_FETCH_COLUMNS": "ID, DEPARTMENTID",
+    # requests包 Requests HTTP Library, 可使用自定义封装请求日志的requests代替
     "REQUESTS_LIBRARY": "requests",
 }
 ```
@@ -144,4 +160,42 @@ urlpatterns = [
     ...,
     path("api/", include("oa_workflow_api.urls"))
 ]
+```
+
+### 5.同步OA账号到当前项目
+#### 5.1 设置保存数据的表
+oa_workflow_api已经设置了相关表，可执直接执行迁移命令生成
+详情请查看oa_workflow_api.models.OaUserInfo
+```
+class OaUserInfo(models.Model):
+    user_id = models.IntegerField(unique=True, primary_key=True, verbose_name="OA用户数据ID")
+    staff_code = models.OneToOneField(
+        UserModel,
+        on_delete=models.DO_NOTHING,
+        to_field=UserModel.USERNAME_FIELD,
+        db_column="staff_code",
+        db_constraint=False,
+        verbose_name="OA用户工号",
+    )
+    dept_id = models.IntegerField(null=True, verbose_name="OA用户部门ID")
+```
+```
+python manage.py migrate oa_workflow_api
+
+```
+
+#### 5.2 在admin后台添加oa_workflow_api中的定时任务
+需要celery以及django-celery-beat
+![img.png](static/img.png)
+
+#### 5.3 项目User获取同步到的oa用户信息
+```
+from django.contrib.auth import get_user_model
+
+user = get_user_model().objects.select_related("oauserinfo").first()
+if hasattr(user, "oauserinfo"):
+    print(user.oauserinfo.user_id)
+    print(user.oauserinfo.staff_code)
+    print(user.oauserinfo.staff_code_id)
+    print(user.oauserinfo.dept_id)
 ```
