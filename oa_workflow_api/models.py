@@ -4,16 +4,20 @@ from django.db import models
 
 from .settings import SETTING_PREFIX, api_settings
 
-if api_settings.USE_OA_USER_INFO_MODEL:
+if api_settings.USE_SYNC_OA_USER_INFO_MODEL:
     UserModel = get_user_model()
 
     try:
         UserModel._meta.get_field(api_settings.STAFF_CODE_FIELD_NAME)
     except FieldDoesNotExist:
         raise FieldDoesNotExist(
-            f"项目用户Model '{UserModel}' 中不存在"
-            f"项目 setting 中 {SETTING_PREFIX}配置指定的’STAFF_CODE_FIELD_NAME‘: '{api_settings.STAFF_CODE_FIELD_NAME}'"
-            f"请重新指定字段名或者在Model上添加相应字段!"
+            f"("
+            f"\n    项目配置'{SETTING_PREFIX}'下 USE_SYNC_OA_USER_INFO_MODEL={api_settings.USE_SYNC_OA_USER_INFO_MODEL} "
+            f"设置为开启用于同步OA用户信息的Model,"
+            f"\n    但是当前项目用户Model '{UserModel}' 中不存在"
+            f"\n    项目配置'{SETTING_PREFIX}'指定的'STAFF_CODE_FIELD_NAME': '{api_settings.STAFF_CODE_FIELD_NAME}',"
+            f"\n    请重新指定配置中字段名或者在项目用户Model上添加相应字段'{api_settings.STAFF_CODE_FIELD_NAME}'!"
+            f"\n)"
         )
 
     class OaUserInfo(models.Model):

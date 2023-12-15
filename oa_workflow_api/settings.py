@@ -26,8 +26,8 @@ DEFAULTS = {
     "OA_DB_HOST": "",
     "OA_DB_PORT": 0,
     "OA_DB_SERVER_NAME": "",
-    # 使用model OaUserInfo
-    "USE_OA_USER_INFO_MODEL": False,
+    # 使用model oa_workflow_api.OaUserInfo
+    "USE_SYNC_OA_USER_INFO_MODEL": False,
     # OA数据库用户表信息
     "OA_DB_USER_TABLE": OA_DB_USER_TABLE,
     "OA_DB_USER_ID_COLUMN": OA_DB_USER_ID_COLUMN,
