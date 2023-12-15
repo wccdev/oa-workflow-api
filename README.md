@@ -166,7 +166,13 @@ urlpatterns = [
 #### 5.1 设置保存数据的表
 oa_workflow_api已经设置了相关表，可执直接执行迁移命令生成
 详情请查看oa_workflow_api.models.OaUserInfo
-```
+```python
+from django.contrib.auth import get_user_model
+from django.db import models
+
+UserModel = get_user_model()
+
+
 class OaUserInfo(models.Model):
     user_id = models.IntegerField(unique=True, primary_key=True, verbose_name="OA用户数据ID")
     staff_code = models.OneToOneField(
@@ -179,7 +185,7 @@ class OaUserInfo(models.Model):
     )
     dept_id = models.IntegerField(null=True, verbose_name="OA用户部门ID")
 ```
-```
+```bash
 python manage.py migrate oa_workflow_api
 
 ```
@@ -189,7 +195,7 @@ python manage.py migrate oa_workflow_api
 ![img.png](static/img.png)
 
 #### 5.3 项目User获取同步到的oa用户信息
-```
+```python
 from django.contrib.auth import get_user_model
 
 user = get_user_model().objects.select_related("oauserinfo").first()
