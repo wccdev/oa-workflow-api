@@ -6,7 +6,10 @@ from itertools import groupby
 import requests as system_requests
 from Crypto.Cipher import PKCS1_v1_5
 from Crypto.PublicKey import RSA
+from django.apps import apps as django_apps
+from django.conf import settings
 from django.core.cache import cache
+from django.core.exceptions import ImproperlyConfigured
 from requests.exceptions import JSONDecodeError
 from rest_framework.exceptions import APIException
 
@@ -14,6 +17,17 @@ from .db_connections import get_oa_oracle_connection
 from .settings import api_settings
 
 requests: system_requests = api_settings.REQUESTS_LIBRARY
+
+
+def get_sync_oa_user_model():
+    try:
+        return django_apps.get_model(api_settings.SYNC_OA_USER_MODEL, require_ready=False)
+    except ValueError:
+        raise ImproperlyConfigured("SYNC_OA_USER_MODEL must be of the form 'app_label.model_name'")
+    except LookupError:
+        raise ImproperlyConfigured(
+            "SYNC_OA_USER_MODEL refers to model '%s' that has not been installed" % settings.SYNC_OA_USER_MODEL
+        )
 
 
 class FetchOaDbHandler:
@@ -67,6 +81,25 @@ class FetchOaDbHandler:
             """
         with get_oa_oracle_connection().cursor() as cursor:
             cursor.execute(sql)
+            res = cursor.fetchall()
+        return list(res)
+
+    @classmethod
+    def get_all_oa_users(cls) -> list:
+        """
+        批量通过长工号获取对应的OA用户id
+        :return: [[OA用户ID, OA用户部门ID], ...] -> [[18781, 23], [18782, 23], ...]
+        """
+        cls.pre_checking()
+        sql = f"""
+                SELECT {api_settings.OA_DB_USER_FETCH_COLUMNS}
+                FROM {api_settings.OA_DB_USER_TABLE}
+                WHERE {api_settings.OA_DB_USER_STAFF_CODE_COLUMN} IS NOT NULL
+                """
+        with get_oa_oracle_connection().cursor() as cursor:
+            cursor.execute(sql)
+            columns = [col[0].lower() for col in cursor.description]
+            cursor.rowfactory = lambda *values: dict(zip(columns, values))
             res = cursor.fetchall()
         return list(res)
 
