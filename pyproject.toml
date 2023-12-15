@@ -1,7 +1,7 @@
 [tool]
 [tool.poetry]
 name = "oa-workflow-api"
-version = "0.2.1"
+version = "0.4.0"
 homepage = "https://github.com/wccdev/oa-workflow-api"
 description = "Skeleton project created by Cookiecutter PyPackage."
 authors = ["Leslie CHan <ampedee@gmail.com>"]
@@ -52,6 +52,7 @@ django = ">=3.2"
 djangorestframework = "^3.14.0"
 cx-oracle = "^8.3.0"
 oracledb = "^1.4.2"
+celery = "^5.3.6"
 
 [tool.poetry.extras]
 test = [

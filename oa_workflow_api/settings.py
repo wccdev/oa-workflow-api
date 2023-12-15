@@ -14,6 +14,8 @@ OA_DB_USER_STAFF_CODE_COLUMN = "LOGINID"
 # OA数据库用户表部门ID字段
 OA_DB_USER_DEPT_ID_COLUMN = "DEPARTMENTID"
 
+DEFAULT_SYNC_OA_USER_MODEL = "oa_workflow_api.OaUserInfo"
+
 DEFAULTS = {
     # OA开放接口
     "APP_ID": "",
@@ -32,8 +34,6 @@ DEFAULTS = {
     "OA_DB_USER_STAFF_CODE_COLUMN": OA_DB_USER_STAFF_CODE_COLUMN,
     "OA_DB_USER_DEPT_ID_COLUMN": OA_DB_USER_DEPT_ID_COLUMN,
     "OA_DB_USER_FETCH_COLUMNS": f"{OA_DB_USER_ID_COLUMN}, {OA_DB_USER_DEPT_ID_COLUMN}",
-    # 用于同步OA用户信息的model
-    "SYNC_OA_USER_MODEL": None,
     # requests包
     "REQUESTS_LIBRARY": "requests",
 }
@@ -41,7 +41,6 @@ DEFAULTS = {
 
 # List of settings that may be in string import notation.
 IMPORT_STRINGS = [
-    "SYNC_OA_USER_MODEL",
     "REQUESTS_LIBRARY",
 ]
 

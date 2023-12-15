@@ -1,9 +1,18 @@
+from celery import shared_task
+
 from .utils import FetchOaDbHandler, get_sync_oa_user_model
 
 
+@shared_task(name="oa_workflow_api:同步Oa用户")
 def sync_oa_users():
     """
-    同步Oa用户到项目
+    同步Oa用户
     """
-    oa_user_model = get_sync_oa_user_model()  # noqa
-    FetchOaDbHandler.get_all_oa_users()
+    oa_user_model = get_sync_oa_user_model()
+    all_oa_users = FetchOaDbHandler.get_all_oa_users()
+    objs = []
+    for i in all_oa_users:
+        objs.append(oa_user_model.as_obj(i))
+    oa_user_model.objects.bulk_create(
+        objs, update_conflicts=True, update_fields=["staff_code_id", "dept_id"], unique_fields=["user_id"]
+    )

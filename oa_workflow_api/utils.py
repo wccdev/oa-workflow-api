@@ -14,19 +14,20 @@ from requests.exceptions import JSONDecodeError
 from rest_framework.exceptions import APIException
 
 from .db_connections import get_oa_oracle_connection
-from .settings import api_settings
+from .settings import DEFAULT_SYNC_OA_USER_MODEL, api_settings
 
 requests: system_requests = api_settings.REQUESTS_LIBRARY
 
 
 def get_sync_oa_user_model():
+    sync_oa_user_model = getattr(settings, "SYNC_OA_USER_MODEL", DEFAULT_SYNC_OA_USER_MODEL)
     try:
-        return django_apps.get_model(api_settings.SYNC_OA_USER_MODEL, require_ready=False)
+        return django_apps.get_model(sync_oa_user_model, require_ready=False)
     except ValueError:
         raise ImproperlyConfigured("SYNC_OA_USER_MODEL must be of the form 'app_label.model_name'")
     except LookupError:
         raise ImproperlyConfigured(
-            "SYNC_OA_USER_MODEL refers to model '%s' that has not been installed" % settings.SYNC_OA_USER_MODEL
+            "SYNC_OA_USER_MODEL refers to model '%s' that has not been installed" % sync_oa_user_model
         )
 
 
@@ -85,20 +86,28 @@ class FetchOaDbHandler:
         return list(res)
 
     @classmethod
-    def get_all_oa_users(cls) -> list:
+    def get_all_oa_users(cls, fields=None, capital=True) -> list:
         """
-        批量通过长工号获取对应的OA用户id
-        :return: [[OA用户ID, OA用户部门ID], ...] -> [[18781, 23], [18782, 23], ...]
+        获取全部OA用户信息
+        :param fields: 查询字段
+        :param capital: 字段名大写
+        :return:
         """
         cls.pre_checking()
+        default_fields = (
+            f"{api_settings.OA_DB_USER_ID_COLUMN},"
+            f"{api_settings.OA_DB_USER_STAFF_CODE_COLUMN},"
+            f"{api_settings.OA_DB_USER_DEPT_ID_COLUMN}"
+        )
+        fetch_fields = fields or default_fields
         sql = f"""
-                SELECT {api_settings.OA_DB_USER_FETCH_COLUMNS}
+                SELECT {fetch_fields}
                 FROM {api_settings.OA_DB_USER_TABLE}
                 WHERE {api_settings.OA_DB_USER_STAFF_CODE_COLUMN} IS NOT NULL
                 """
         with get_oa_oracle_connection().cursor() as cursor:
             cursor.execute(sql)
-            columns = [col[0].lower() for col in cursor.description]
+            columns = [col[0].upper() if capital else col[0].lower() for col in cursor.description]
             cursor.rowfactory = lambda *values: dict(zip(columns, values))
             res = cursor.fetchall()
         return list(res)
