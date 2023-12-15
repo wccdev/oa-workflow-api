@@ -6,4 +6,4 @@ def sync_oa_users():
     同步Oa用户到项目
     """
     oa_user_model = get_sync_oa_user_model()  # noqa
-    FetchOaDbHandler.get_instance()
+    FetchOaDbHandler.get_all_oa_users()
