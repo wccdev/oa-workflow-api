@@ -39,9 +39,9 @@ class FetchOaDbHandler:
         """
         cls.pre_checking()
         sql = f"""
-            SELECT {api_settings.OA_DB_USER_FETCH_FIELDS}
-            FROM {api_settings.OA_DB_USERS_TABLE}
-            WHERE {api_settings.OA_DB_USER_JOB_CODE_FIELD} = '{job_code}'
+            SELECT {api_settings.OA_DB_USER_FETCH_COLUMNS}
+            FROM {api_settings.OA_DB_USER_TABLE}
+            WHERE {api_settings.OA_DB_USER_STAFF_CODE_COLUMN} = '{job_code}'
             """
         with get_oa_oracle_connection().cursor() as cursor:
             cursor.execute(sql)
@@ -61,9 +61,9 @@ class FetchOaDbHandler:
         job_codes = [f"'{i}'" for i in job_codes]
         conditions = f"({','.join(job_codes)})"
         sql = f"""
-            SELECT {api_settings.OA_DB_USER_FETCH_FIELDS}
-            FROM {api_settings.OA_DB_USERS_TABLE}
-            WHERE {api_settings.OA_DB_USER_JOB_CODE_FIELD} IN {conditions}
+            SELECT {api_settings.OA_DB_USER_FETCH_COLUMNS}
+            FROM {api_settings.OA_DB_USER_TABLE}
+            WHERE {api_settings.OA_DB_USER_STAFF_CODE_COLUMN} IN {conditions}
             """
         with get_oa_oracle_connection().cursor() as cursor:
             cursor.execute(sql)

@@ -3,24 +3,40 @@ from importlib import import_module
 from django.conf import settings
 from django.test.signals import setting_changed
 
-# from django.utils.module_loading import import_string
+SETTING_PREFIX = "OA_WORKFLOW_API"
+
+# OA数据库用户表
+OA_DB_USER_TABLE = "ECOLOGY.HRMRESOURCE"
+# OA数据库用户表ID字段
+OA_DB_USER_ID_COLUMN = "ID"
+# OA数据库用户表工号字段
+OA_DB_USER_STAFF_CODE_COLUMN = "LOGINID"
+# OA数据库用户表部门ID字段
+OA_DB_USER_DEPT_ID_COLUMN = "DEPARTMENTID"
 
 DEFAULTS = {
+    # OA开放接口
     "APP_ID": "",
     "APP_RAW_SECRET": "",
     "APP_SPK": "",
     "OA_HOST": "",
-    "REQUESTS_LIBRARY": "requests",
     # OA数据库，可选
     "OA_DB_USER": "",
     "OA_DB_PASSWORD": "",
     "OA_DB_HOST": "",
     "OA_DB_PORT": 0,
     "OA_DB_SERVER_NAME": "",
+    # 使用model OaUserInfo
+    "USE_OA_USER_INFO_MODEL": False,
     # OA数据库用户表信息
-    "OA_DB_USER_TABLE": "ECOLOGY.HRMRESOURCE",
-    "OA_DB_USER_JOB_CODE_FIELD": "LOGINID",
-    "OA_DB_USER_FETCH_FIELDS": "ID, DEPARTMENTID",
+    "OA_DB_USER_TABLE": OA_DB_USER_TABLE,
+    "OA_DB_USER_ID_COLUMN": OA_DB_USER_ID_COLUMN,
+    "OA_DB_USER_STAFF_CODE_COLUMN": OA_DB_USER_STAFF_CODE_COLUMN,
+    "OA_DB_USER_DEPT_ID_COLUMN": OA_DB_USER_DEPT_ID_COLUMN,
+    "OA_DB_USER_FETCH_COLUMNS": f"{OA_DB_USER_ID_COLUMN}, {OA_DB_USER_DEPT_ID_COLUMN}",
+    # django用户表工号字段名称
+    "STAFF_CODE_FIELD_NAME": "staff_code",
+    "REQUESTS_LIBRARY": "requests",
 }
 
 
@@ -106,7 +122,7 @@ api_settings = APISettings(None, DEFAULTS, IMPORT_STRINGS)
 
 def reload_api_settings(*args, **kwargs):
     setting = kwargs["setting"]
-    if setting == "OA_WORKFLOW_API":
+    if setting == SETTING_PREFIX:
         api_settings.reload()
 
 
