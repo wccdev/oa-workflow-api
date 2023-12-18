@@ -178,6 +178,10 @@ class OaApi(FetchOaDbHandler):
         headers = {"Content-Type": self.REQUEST_CONTENTTYPE}
         post_data = {"appid": api_settings.OA_SSO_TOKEN_APP_ID, "loginid": staff_code}
         token = self._post_oa(api_path, post_data=post_data, headers=headers, need_json=False)
+        # RIGHT DCA2CD1A9AFA13A8CEA5C82A5CDE8D7ADABA81522626723EC559D733649FABDC
+        # ERROR Token获取失败: 认证应用未注册
+        if "失败" in token:
+            raise APIException(token)
         return token
 
     @property
