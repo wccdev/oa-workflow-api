@@ -14,7 +14,7 @@ from requests.exceptions import JSONDecodeError
 from rest_framework.exceptions import APIException
 
 from .db_connections import get_oa_oracle_connection
-from .settings import DEFAULT_SYNC_OA_USER_MODEL, api_settings
+from .settings import DEFAULT_SYNC_OA_USER_MODEL, SETTING_PREFIX, api_settings
 
 requests: system_requests = api_settings.REQUESTS_LIBRARY
 
@@ -167,21 +167,16 @@ class OaApi(FetchOaDbHandler):
             raise ValueError(error)
         self.recursion_c += 1
 
-    def get_sso_token(self, login_id):
-        raise BaseException("暂无法使用该方法")
-        UMAP = {  # noqa
-            "18781": "A0009527",
-            "18783": "A0009528",
-            "18784": "A0009529",
-            "18785": "A0009530",
-            "18786": "A0009531",
-            "18787": "A0009555",
-            "18788": "A0009556",
-            "1": "sysadmin",
-        }
+    def get_sso_token(self, staff_code):
+        """
+        获取SSO TOKEN
+        :param staff_code: 用户工号或者为oa的登入名, A0009527
+        """
+        if not api_settings.OA_SSO_TOKEN_APP_ID:
+            raise ValueError(f"使用此方法请先配置f'{SETTING_PREFIX}'.'OA_SSO_TOKEN_APP_ID'")
         api_path = "/ssologin/getToken"
         headers = {"Content-Type": self.REQUEST_CONTENTTYPE}
-        post_data = {"appid": "srm_test", "loginid": UMAP[login_id]}
+        post_data = {"appid": api_settings.OA_SSO_TOKEN_APP_ID, "loginid": staff_code}
         token = self._post_oa(api_path, post_data=post_data, headers=headers, need_json=False)
         return token
 
