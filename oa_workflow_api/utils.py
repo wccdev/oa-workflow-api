@@ -538,9 +538,11 @@ class OaWorkFlow(OaApi):
         }
         return resp
 
-    def get_chart_url(self, request_id: str):
+    def get_chart_url(self, request_id: str, staff_code):
         """
         OA流程明细页 流程图 数据
+        :param request_id: OA流程实例ID
+        :param staff_code: 用户工号或者为oa的登入名, A0009527
         :return:
         """
         api_path = "/api/workflow/paService/getRequestFlowChart"
@@ -560,7 +562,7 @@ class OaWorkFlow(OaApi):
             "errMsg": {},
         }
         # 获取单点Token
-        sso_token = self.get_sso_token(self.oa_user_id)
+        sso_token = self.get_sso_token(staff_code)
         resp["data"]["chartUrl"] = resp["data"]["chartUrl"] + f"&ssoToken={sso_token}"
         return resp
 
