@@ -8,6 +8,7 @@ UserModel = get_user_model()
 
 class AbstractOaUserInfo(models.Model):
     user_id = models.IntegerField(unique=True, primary_key=True, verbose_name="OA用户数据ID")
+    name = models.CharField(max_length=480, blank=True, default="", verbose_name="名称")
     staff_code = models.OneToOneField(
         UserModel,
         on_delete=models.DO_NOTHING,
@@ -41,4 +42,5 @@ class OaUserInfo(AbstractOaUserInfo):
             user_id=data[api_settings.OA_DB_USER_ID_COLUMN],
             staff_code_id=data[api_settings.OA_DB_USER_STAFF_CODE_COLUMN],
             dept_id=data[api_settings.OA_DB_USER_DEPT_ID_COLUMN],
+            name=data[api_settings.OA_DB_USER_NAME_COLUMN] or "",
         )

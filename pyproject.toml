@@ -1,7 +1,7 @@
 [tool]
 [tool.poetry]
 name = "oa-workflow-api"
-version = "0.4.1"
+version = "0.4.2"
 homepage = "https://github.com/wccdev/oa-workflow-api"
 description = "Skeleton project created by Cookiecutter PyPackage."
 authors = ["Leslie CHan <ampedee@gmail.com>"]

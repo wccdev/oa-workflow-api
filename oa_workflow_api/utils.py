@@ -97,7 +97,8 @@ class FetchOaDbHandler:
         default_fields = (
             f"{api_settings.OA_DB_USER_ID_COLUMN},"
             f"{api_settings.OA_DB_USER_STAFF_CODE_COLUMN},"
-            f"{api_settings.OA_DB_USER_DEPT_ID_COLUMN}"
+            f"{api_settings.OA_DB_USER_DEPT_ID_COLUMN},"
+            f"{api_settings.OA_DB_USER_NAME_COLUMN}"
         )
         fetch_fields = fields or default_fields
         sql = f"""
