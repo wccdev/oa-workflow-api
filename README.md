@@ -50,7 +50,8 @@ OA_WORKFLOW_API = {
     "APP_SPK": "xxxxxxxxxx",
     # oa接口服务地址(域名)
     "OA_HOST": "https://oa.demo.com",
-    # >以下可选< #
+
+    # -----以下可选----- #
     # OA数据库连接信息
     "OA_DB_USER": "",
     "OA_DB_PASSWORD": "",
@@ -163,6 +164,7 @@ urlpatterns = [
 ```
 
 ### 5.同步OA账号到当前项目
+- 同步数据前需要在项目设置OA_WORKFLOW_API中配置AO数据库连接以及指定用户表信息
 #### 5.1 设置保存数据的表
 oa_workflow_api已经设置了相关表，可执直接执行迁移命令生成
 详情请查看oa_workflow_api.models.OaUserInfo

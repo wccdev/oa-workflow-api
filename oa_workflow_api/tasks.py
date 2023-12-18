@@ -1,4 +1,7 @@
-from celery import shared_task
+try:
+    from celery import shared_task  # noqa
+except ModuleNotFoundError:
+    shared_task = lambda name: type(name)  # noqa
 
 from .utils import FetchOaDbHandler, get_sync_oa_user_model
 
