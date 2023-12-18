@@ -105,8 +105,11 @@ class User(Model):
         ...
 
     @property
-    def oa_user_id(self):
-        # TODO
+    def oa_user_id(self):\
+        # TODO 获取对应oa用户逻辑
+        if hasattr(self, "oauserinfo"):
+            return self.oauserinfo.user_id
+        # 或者自定义逻辑
         oa_user_id = "1"
         return oa_user_id
 ```
