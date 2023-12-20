@@ -14,6 +14,7 @@ class AbstractOaUserInfo(models.Model):
         on_delete=models.DO_NOTHING,
         to_field=UserModel.USERNAME_FIELD,
         # related_name="oa_user",
+        null=True,
         db_column="staff_code",
         db_constraint=False,
         verbose_name="OA用户工号",
