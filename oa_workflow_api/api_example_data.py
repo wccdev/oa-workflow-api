@@ -1,3 +1,7 @@
+# flake8: noqa
+
+import json
+
 # 待办列表
 TODO_LIST_DEMO = [
     {
@@ -119,7 +123,7 @@ SUBMIT_DATA_DEMO = {}
 
 doc_id = "ABCCCCCCCCCCC"
 doc_code = f"Leslie-TEST-{doc_id}"
-"""1.内部价2"""
+# 1.内部价2
 SUBMIT_DATA_DEMO_1 = {  # noqa
     "detailData": json.dumps(
         [
@@ -160,7 +164,7 @@ SUBMIT_DATA_DEMO_1 = {  # noqa
     "workflowId": "51022",  # 内部价2
 }
 
-"""2.S-特价报备流程2"""
+# 2.S-特价报备流程2
 SUBMIT_DATA_DEMO_2 = {  # noqa
     "detailData": json.dumps(
         [
@@ -216,7 +220,7 @@ SUBMIT_DATA_DEMO_2 = {  # noqa
     "workflowId": "50021",  # S-特价报备流程2
 }
 
-"""SRM V0.1"""
+# SRM V0.1
 SUBMIT_DATA_DEMO_3 = {  # noqa
     "mainData": json.dumps(
         [
@@ -284,11 +288,11 @@ WF_RESOURCE_DATA_DEMO_1 = {  # noqa
             "createrid": 1,
             "createtime": "18:05:14",
             "downloadUrl": "/weaver/weaver.file.FileDownload?"
-                           "fileid=ab99dab3f07c723903c7fdeb696"
-                           "e56eed2a6885aa3f633100a6e5fb5cc55a"
-                           "f339d1c3817502a4fc2f476f90a9ce9fc8"
-                           "b3cb067d6b4bb7f4d1&amp;download=1&"
-                           "amp;requestid=&amp;ddcode=45a3b24f8d8aeca4",
+            "fileid=ab99dab3f07c723903c7fdeb696"
+            "e56eed2a6885aa3f633100a6e5fb5cc55a"
+            "f339d1c3817502a4fc2f476f90a9ce9fc8"
+            "b3cb067d6b4bb7f4d1&amp;download=1&"
+            "amp;requestid=&amp;ddcode=45a3b24f8d8aeca4",
             "id": 13529,
             "name": "计时器.png",
             "type": 3,
@@ -299,10 +303,10 @@ WF_RESOURCE_DATA_DEMO_1 = {  # noqa
             "createrid": 1,
             "createtime": "18:05:15",
             "downloadUrl": "/weaver/weaver.file.FileDownload?fileid"
-                           "=a170157de37192f7a67a612d37a2bfeefc7d9f"
-                           "09056b45b5e1bf048cf9294b2ffab4f36b60ab2"
-                           "64bf1405a62c95de624acb067d6b4bb7f4d1&am"
-                           "p;download=1&amp;requestid=&amp;ddcode=ea71400844d01f1d",
+            "=a170157de37192f7a67a612d37a2bfeefc7d9f"
+            "09056b45b5e1bf048cf9294b2ffab4f36b60ab2"
+            "64bf1405a62c95de624acb067d6b4bb7f4d1&am"
+            "p;download=1&amp;requestid=&amp;ddcode=ea71400844d01f1d",
             "id": 13530,
             "name": "test.py",
             "type": 3,
@@ -355,11 +359,11 @@ WF_RESOURCE_DATA_DEMO_2 = {  # noqa
             'createrid': 1,
             'createtime': '18:05:14',
             'downloadUrl': '/weaver/weaver.file.FileDownload?fil'
-                           'eid=a8462a2aefc95637489c1085bee08b34'
-                           '6254c7a6e7eb28707d2c2374288f69a2905d'
-                           'ea01c801cea42d890ab08a283f0d87136214'
-                           '1037cfb4e&download=1&requestid=&ddco'
-                           'de=45a3b24f8d8aeca4',
+            'eid=a8462a2aefc95637489c1085bee08b34'
+            '6254c7a6e7eb28707d2c2374288f69a2905d'
+            'ea01c801cea42d890ab08a283f0d87136214'
+            '1037cfb4e&download=1&requestid=&ddco'
+            'de=45a3b24f8d8aeca4',
             'id': 13529,
             'name': '计时器.png',
             'type': 3,
@@ -370,10 +374,10 @@ WF_RESOURCE_DATA_DEMO_2 = {  # noqa
             'createrid': 1,
             'createtime': '18:05:15',
             'downloadUrl': '/weaver/weaver.file.FileDownload?file'
-                           'id=a0adc047bc57e9af7a5b33de57d18409b5'
-                           '33970a43927596406fa3e32c64751d3ad5cf1'
-                           'a03d173f1dd890ab08a283f0d871362141037'
-                           'cfb4e&download=1&requestid=&ddcode=ea71400844d01f1d',
+            'id=a0adc047bc57e9af7a5b33de57d18409b5'
+            '33970a43927596406fa3e32c64751d3ad5cf1'
+            'a03d173f1dd890ab08a283f0d871362141037'
+            'cfb4e&download=1&requestid=&ddcode=ea71400844d01f1d',
             'id': 13530,
             'name': 'test.py',
             'type': 3,
@@ -489,8 +493,7 @@ WF_INFO_DATA_DEMO = {  # noqa
         'workflowDetailTableInfos': [
             {
                 'tableDBName': 'formtable_main_266_dt1',
-                'tableFieldName': ['产品编号', '币种', '价格', '价格标识', '产品类型', '采购企业', '销售企业',
-                                   '生效日期', '终止日期'],
+                'tableFieldName': ['产品编号', '币种', '价格', '价格标识', '产品类型', '采购企业', '销售企业', '生效日期', '终止日期'],
                 'tableTitle': '',
                 'workflowRequestTableRecords': [
                     {

@@ -486,6 +486,42 @@ class OaWorkFlow(OaApi):
         oa_request_id = res["data"]["requestid"]
         return oa_request_id
 
+    def submit_new(
+        self, work_flow_id, main_data: list, detail_data: list = None, title="", remark="", request_level=""
+    ):
+        """
+        创建流程
+        :param work_flow_id: Oa中的流程ID
+        :param main_data: 提交流程的主表数据
+        :param detail_data: 提交流程的子表数据
+        :param title: 提交流程的标题
+        :param remark: 提交流程的备注（审批意见）
+        :param request_level: 流程紧急度（如果有）
+        """
+        if not work_flow_id:
+            raise APIException("需要提交流程的流程ID")
+        if not main_data:
+            raise APIException("需要提交流程的主表数据")
+        post_data = {
+            "mainData": json.dumps(main_data),
+            "detailData": json.dumps(detail_data),
+            "otherParams": {},
+            "remark": remark,
+            # "requestLevel": "0",
+            # "requestName": "标题",
+            "workflowId": str(work_flow_id),
+        }
+        if title:
+            post_data["requestName"] = title
+        if request_level:
+            post_data["requestLevel"] = request_level
+
+        # 示例数据 api_example_data.SUBMIT_DATA_DEMO
+        api_path = "/api/workflow/paService/doCreateRequest"
+        res: dict = self._post_oa(api_path, post_data=post_data)
+        oa_request_id = res["data"]["requestid"]
+        return oa_request_id
+
     def review(self, request_id: str, remark="", extras: dict = None):
         """
         提交/审核
