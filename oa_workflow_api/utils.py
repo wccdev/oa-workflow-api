@@ -323,12 +323,18 @@ class OaApi(FetchOaDbHandler):
         self.recursion_c = 0
         return res
 
-    def _page_data(self, page_count_path, page_data_path, workflow_id, page=1, page_size=10):
+    def _page_data(self, page_count_path, page_data_path, workflow_id, page=1, page_size=10, conditions: dict = None):
         """
         请求分页数据
         :param page_count_path:
         :param page_data_path:
         :param workflow_id:
+        :param conditions: 查询条件
+            -- archivestatus  流程是否归档。 1: 已归档 2: 未归档
+            -- nodetype:      当前节点类型。 0: 创建，1: 批准，2: 提交，3: 归档
+            -- requestlevel:  紧急程度      0: 正常 1: 重要 2: 紧急
+            -- workflowIds：  流程路径id 以','分隔
+            -- workflowTypes：流程类型id 以','分隔
         :return:
         """
         """
@@ -337,12 +343,14 @@ class OaApi(FetchOaDbHandler):
            内部价2                       workflowIds           id = 51022
            内部价                        workflowIds           id = 50522
         """
-        # search_conditions = {"conditions": json.dumps({"workflowTypes": "1021"})}
+        if not conditions:
+            conditions = {}
         search_conditions = {
             "conditions": json.dumps(
                 {
                     # "workflowTypes": "1021",  # 流程目录ID  2,3,4
-                    "workflowIds": workflow_id  # 流程ID     1,2,3
+                    **conditions,
+                    "workflowIds": workflow_id,  # 流程ID     1,2,3
                 }
             )
         }
@@ -420,28 +428,59 @@ class OaApi(FetchOaDbHandler):
 
 
 class OaWorkFlow(OaApi):
-    def get_todo_list(self, workflow_id, page, page_size):
+    def get_todo_list(self, workflow_id, page, page_size, conditions=None):
         """
         待办流程
         """
-        # count_api_path = "/api/workflow/paService/getDoingWorkflowRequestCount"
-        # data_api_path = "/api/workflow/paService/getDoingWorkflowRequestList"
         count_api_path = "/api/workflow/paService/getToDoWorkflowRequestCount"
         data_api_path = "/api/workflow/paService/getToDoWorkflowRequestList"
         data, page, total_count = self._page_data(
-            count_api_path, data_api_path, workflow_id, page=page, page_size=page_size
+            count_api_path, data_api_path, workflow_id, page=page, page_size=page_size, conditions=conditions
         )
         # 示例数据 api_example_data.TODO_LIST_DEMO
         return data, page, total_count
 
-    def get_handled_list(self, workflow_id, page, page_size):
+    def get_doing_list(self, workflow_id, page, page_size, conditions=None):
+        """
+        待办列表->待处理
+        """
+        count_api_path = "/api/workflow/paService/getDoingWorkflowRequestCount"
+        data_api_path = "/api/workflow/paService/getDoingWorkflowRequestList"
+        data, page, total_count = self._page_data(
+            count_api_path, data_api_path, workflow_id, page=page, page_size=page_size, conditions=conditions
+        )
+        return data, page, total_count
+
+    def get_unread_list(self, workflow_id, page, page_size, conditions=None):
+        """
+        待办列表->待阅
+        """
+        count_api_path = "/api/workflow/paService/getToBeReadWorkflowRequestCount"
+        data_api_path = "/api/workflow/paService/getToBeReadWorkflowRequestList"
+        data, page, total_count = self._page_data(
+            count_api_path, data_api_path, workflow_id, page=page, page_size=page_size, conditions=conditions
+        )
+        return data, page, total_count
+
+    def get_rejected_list(self, workflow_id, page, page_size, conditions=None):
+        """
+        待办列表->被退回
+        """
+        count_api_path = "/api/workflow/paService/getBeRejectWorkflowRequestCount"
+        data_api_path = "/api/workflow/paService/getBeRejectWorkflowRequestList"
+        data, page, total_count = self._page_data(
+            count_api_path, data_api_path, workflow_id, page=page, page_size=page_size, conditions=conditions
+        )
+        return data, page, total_count
+
+    def get_handled_list(self, workflow_id, page, page_size, conditions=None):
         """
         已办流程
         """
         count_api_path = "/api/workflow/paService/getHandledWorkflowRequestCount"
         data_api_path = "/api/workflow/paService/getHandledWorkflowRequestList"
         data, page, total_count = self._page_data(
-            count_api_path, data_api_path, workflow_id, page=page, page_size=page_size
+            count_api_path, data_api_path, workflow_id, page=page, page_size=page_size, conditions=conditions
         )
         # 示例数据 api_example_data.HANDLED_LIST_DEMO
         return data, page, total_count
