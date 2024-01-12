@@ -20,6 +20,7 @@ class AbstractOaUserInfo(models.Model):
         verbose_name="OA用户工号",
     )
     dept_id = models.IntegerField(null=True, verbose_name="OA用户部门ID")
+    dept_name = models.CharField(max_length=480, blank=True, default="", verbose_name="OA用户部门")
 
     class Meta:
         abstract = True
@@ -44,4 +45,5 @@ class OaUserInfo(AbstractOaUserInfo):
             staff_code_id=data[api_settings.OA_DB_USER_STAFF_CODE_COLUMN],
             dept_id=data[api_settings.OA_DB_USER_DEPT_ID_COLUMN],
             name=data[api_settings.OA_DB_USER_NAME_COLUMN] or "",
+            dept_name=data[api_settings.OA_DB_DEPT_NAME_COLUMN] or "",
         )

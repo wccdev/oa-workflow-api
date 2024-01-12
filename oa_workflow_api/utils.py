@@ -94,18 +94,25 @@ class FetchOaDbHandler:
         :return:
         """
         cls.pre_checking()
+        user_table_alias = "U"
+        dept_table_alias = "D"
         default_fields = (
-            f"{api_settings.OA_DB_USER_ID_COLUMN},"
-            f"{api_settings.OA_DB_USER_STAFF_CODE_COLUMN},"
-            f"{api_settings.OA_DB_USER_DEPT_ID_COLUMN},"
-            f"{api_settings.OA_DB_USER_NAME_COLUMN}"
+            f"{user_table_alias}.{api_settings.OA_DB_USER_ID_COLUMN},"
+            f"{user_table_alias}.{api_settings.OA_DB_USER_STAFF_CODE_COLUMN},"
+            f"{user_table_alias}.{api_settings.OA_DB_USER_DEPT_ID_COLUMN},"
+            f"{user_table_alias}.{api_settings.OA_DB_USER_NAME_COLUMN},"
+            f"{dept_table_alias}.{api_settings.OA_DB_DEPT_NAME_COLUMN}"
         )
         fetch_fields = fields or default_fields
         sql = f"""
-                SELECT {fetch_fields}
-                FROM {api_settings.OA_DB_USER_TABLE}
-                WHERE {api_settings.OA_DB_USER_STAFF_CODE_COLUMN} IS NOT NULL
-                """
+        SELECT {fetch_fields}
+        FROM
+            {api_settings.OA_DB_USER_TABLE} {user_table_alias}
+        LEFT JOIN {api_settings.OA_DB_USER_DEPT_TABLE} {dept_table_alias}
+        ON {user_table_alias}.{api_settings.OA_DB_USER_DEPT_ID_COLUMN} = {dept_table_alias}.{api_settings.OA_DB_DEPT_ID_COLUMN}
+        WHERE
+            {user_table_alias}.{api_settings.OA_DB_USER_STAFF_CODE_COLUMN} IS NOT NULL
+        """  # noqa
         with get_oa_oracle_connection().cursor() as cursor:
             cursor.execute(sql)
             columns = [col[0].upper() if capital else col[0].lower() for col in cursor.description]

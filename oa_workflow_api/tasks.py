@@ -17,5 +17,8 @@ def sync_oa_users():
     for i in all_oa_users:
         objs.append(oa_user_model.as_obj(i))
     oa_user_model.objects.bulk_create(
-        objs, update_conflicts=True, update_fields=["staff_code_id", "dept_id", "name"], unique_fields=["user_id"]
+        objs,
+        update_conflicts=True,
+        update_fields=["staff_code_id", "dept_id", "name", "dept_name"],
+        unique_fields=["user_id"],
     )
