@@ -1,5 +1,6 @@
 import base64
 import json
+import re
 from io import BytesIO
 from itertools import groupby
 
@@ -432,6 +433,47 @@ class OaApi(FetchOaDbHandler):
         files = {"file": file_source}
         resp = self._post_oa(api_path, post_data=body, headers=headers, files=files)
         return resp["data"]["fileid"]
+
+    def get_workflow_chart_url(self, staff_code: str, oa_workflow_id):
+        """
+        获取流程配置的流程图链接， 不需要注册用户
+        :param staff_code:     拥有OA可配置流程权限的账号工号
+        :param oa_workflow_id: 要获取流程图的OA流程ID
+        """
+        oa_host = api_settings.OA_HOST
+        get_chat_path = (
+            "/workflow/workflowDesign/readOnly-index.html"
+            "?isFree=0&isAllowNodeFreeFlow=0&isReadOnlyModel=true"
+            f"&isFlowModel=0&hasFreeNode=0&showE9Pic=1&isFromWfForm=true&workflowId={oa_workflow_id}"
+        )
+        oa_sso_token = self.get_sso_token(staff_code)
+        oa_chat_url = f"{oa_host}{get_chat_path}&ssoToken={oa_sso_token}"
+        return oa_chat_url
+
+    def get_workflow_chart_xml(self, oa_workflow_id):
+        """
+        获取流程配置的流程图xml数据
+        需要高权限级别的OA账号
+        :param oa_workflow_id: 要获取流程图的OA流程ID
+        """
+        get_xml_path = "/api/workflow/layout/getXml"
+        post_data = {
+            "workflowId": oa_workflow_id,
+            "backstageReadOnly": True,
+        }
+        res = self._post_oa(get_xml_path, post_data=post_data)
+        xml_content = res.get("xml", "")
+        if not xml_content:
+            return ""
+
+        # xml中的节点名value的值需要base64解码
+        b64_node_names = re.findall(r"value=\"base64_(?P<b64_node_name>\S+)\"", xml_content)
+        b64_node_names = set(b64_node_names)
+        for i in b64_node_names:
+            node_name = base64.b64decode(i).decode()
+            replace_str = f"base64_{i}"
+            xml_content = xml_content.replace(replace_str, node_name)
+        return xml_content
 
 
 class OaWorkFlow(OaApi):
