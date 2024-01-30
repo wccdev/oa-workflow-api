@@ -11,7 +11,7 @@ from django.apps import apps as django_apps
 from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
-from requests.exceptions import JSONDecodeError
+from requests.exceptions import ConnectionError, JSONDecodeError
 from rest_framework.exceptions import APIException
 
 from .db_connections import get_oa_oracle_connection
@@ -276,7 +276,7 @@ class OaApi(FetchOaDbHandler):
         headers = headers or self._request_headers
         try:
             resp: system_requests.Response = rf(url, headers=headers, **kwargs)
-        except requests.exceptions.ConnectionError:
+        except ConnectionError:
             raise APIException("网络异常，系统无法连接到OA服务")
 
         if resp.status_code != 200:
